@@ -1,71 +1,84 @@
 let scores = [0, 0];
-let options = ["rock", "paper", "scissors"];
-let names = ["computer", "player"];
+let options = ['rock', 'paper', 'scissors'];
 
-function getComputerChoice() {
-    let i = Math.trunc(Math.random() * 3);
-    return options[i];
+
+const startButton = document.querySelector('.start');
+startButton.addEventListener('click', startGame);
+
+
+// game running props
+const scoreBoard = document.createElement('div');
+scoreBoard.classList.add('score-board');
+
+
+const buttons = options.map(c => {
+    const img = document.createElement('img');
+    img.className = 'choice-img';
+    img.dataset.value = c;
+    img.src = `${c}.jpeg`;
+    img.addEventListener('click', onChoiceClick)
+    return img;
+})
+
+const choices = document.createElement('div');
+choices.append(...buttons);
+choices.style.display = 'flex';
+choices.style.justifyContent = 'center';
+choices.style.gap = '64px';
+
+const outcome = document.createElement('outcome');
+outcome.className = 'outcome';
+
+
+function startGame() {
+    startButton.remove();
+    scoreBoard.textContent = `Computer: ${scores[0]} Player: ${scores[1]}`;
+    outcome.textContent = `Computer: ? Player ?`;
+    document.body.append(scoreBoard, choices, outcome);
+   
 }
 
-function getPlayerChoice() {
-    let c = prompt("What's your choice").toLowerCase();
-    const idx = options.find(e => e === c);
-    if (idx === undefined) {
-        alert("Invalid input. Please input: rock paper scissors");
-        return getPlayerChoice();
+function onChoiceClick(e) {
+    const playerChoice = e.target.dataset.value;
+    const compChoice = options[Math.floor(Math.random() * 2.99)];
+
+    const outcome = document.querySelector('.outcome');
+    outcome.textContent = `Computer ${compChoice} Player: ${playerChoice}`;
+
+    const scoreBoard = document.querySelector('.score-board');
+    if (playerChoice === 'rock' && compChoice === 'paper') {
+        scoreBoard.textContent = `Computer: ${++scores[0]} Player: ${scores[1]}`;
+    } else if (playerChoice === 'paper' && compChoice === 'rock') {
+        scoreBoard.textContent = `Computer: ${scores[0]} Player: ${++scores[1]}`;
+    } else if (playerChoice === 'paper'&& compChoice === 'scissors') {
+        scoreBoard.textContent = `Computer: ${++scores[0]} Player: ${scores[1]}`;
+    } else if (playerChoice === 'scissors' && compChoice === 'paper') {
+        scoreBoard.textContent = `Computer: ${scores[0]} Player: ${++scores[1]}`;
+    } else if (playerChoice === 'scissors' && compChoice === 'rock') {
+        scoreBoard.textContent = `Computer: ${++scores[0]} Player: ${scores[1]}`;
+    } else if (playerChoice === 'rock' && compChoice === 'scissors') {
+        scoreBoard.textContent =`Computer: ${scores[0]} Player: ${++scores[1]}`;
     }
-    return c;
+
+    if (scores.includes(5)) endgame();
 }
 
+function endgame() {
+    Array.from(document.body.children).slice(1).forEach(e => e.remove());
 
-// returns 0 if computer wins, 1 with player wins, else -1 with no one wins
-function whoWins(arr) {
-    if (arr[0] === "rock" && arr[1] == "scissors") {
-        return 0;
-    } else if (arr[0] === 'scissors' && arr[1] == 'rock') {
-        return 1;
-    } else if (arr[0] === 'scissors' && arr[1] === 'paper') {
-        return 0;
-    } else if (arr[0] === 'paper' && arr[1] === 'scissors') {
-        return 1;
-    } else if (arr[0] === 'paper' && arr[1] === 'rock') {
-        return 0;
-    } else if (arr[0] === 'rock' && arr[1] === 'paper') {
-        return 1;
-    }
-    return -1;
-}
+    const div = document.createElement('div');
+    div.textContent = `${scores[0] === 5 ? 'Computer wins' : 'Player wins'}`;
 
-function playRound() {
-    let com = getComputerChoice();
-    let player = getPlayerChoice();
-    
-    let winner = whoWins([com, player]);
-    if (winner != -1) {
-        scores[winner]++;
-        alert(`Computer input: ${com}, Player's input: ${player}. ${names[winner]} wins`);
-    } else {
-        alert(`Computer input: ${com}, Player's input: ${player}. It's a draw`);
-    }
-}
-
-function playGame() {
-    for (let i = 0; i < 5; i++) playRound();
-    if (scores[1] > scores[0]) {
-        alert("Player wins");
-    } else if (scores[0] > scores[1]) {
-        alert("Computer wins");
-    } else {
-        alert("It's a draw");
-    }
-    
-    
-    let playAgain = confirm("Do you want to play again");
-    if (playAgain) {
+    const restartButton = document.createElement('button');
+    restartButton.textContent = 'restart';
+    restartButton.addEventListener('click', (e) => {
         scores = [0, 0];
-        playGame();
-    } else {
-        return;
-    }
-}
+        Array.from(document.body.children).slice(1).forEach(e => e.remove());
+        document.body.appendChild(startButton);
+        startGame();
+    });
+    restartButton.style.marginLeft = '16px';
+    div.appendChild(restartButton);
 
+    document.body.appendChild(div);
+}

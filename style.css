@@ -1,0 +1,19 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.start {
+    background-color: rgb(95, 176, 203);
+    border-radius: 8px;
+    width: 64px;
+    height: 36px;
+}
+
+.choice-img {
+    width: 200px;
+    height: auto;
+}
